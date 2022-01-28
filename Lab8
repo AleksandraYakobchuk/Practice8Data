@@ -1,0 +1,41 @@
+npm install csvtojson
+
+const csvtojson = require("csvtojson");
+
+csvtojson()
+  .fromFile("bezkoder.csv")
+  .then(csvData => {
+    console.log(csvData);
+/*
+[ { id: '1',
+    name: 'Node.js',
+    description: 'JavaScript runtime environment',
+    createdAt: '2019-09-03' },
+  { id: '2',
+    name: 'Vue.js',
+    description: 'JavaScript Framework for building UI',
+    createdAt: '2019-09-06' },
+  { id: '3',
+    name: 'Angular.js',
+    description: 'Platform for building mobile & desktop web app',
+    createdAt: '2019-09-09' } ]
+*/
+  });
+  
+  mongodb.connect(
+  url,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  (err, client) => {
+    if (err) throw err;
+    client
+      .db("zkoder_db")
+      .collection("category")
+      .insertMany(csvData, (err, res) => {
+        if (err) throw err;
+        console.log(`Inserted: ${res.insertedCount} rows`);
+        client.close();
+      });
+  }
+);
+
+> db.category.find()
