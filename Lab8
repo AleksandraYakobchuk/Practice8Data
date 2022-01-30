@@ -1,41 +1,56 @@
-npm install csvtojson
+#данные
+data.csv
 
-const csvtojson = require("csvtojson");
+Firstname,Lastname,City,Salary
+Dipak,Patil,Pune,2000
+Kishor,Patil,Mumbai,3000
+Ramesh,Patil,Nagpur,4000
+Krushna,Patil,Nashik,5000
 
-csvtojson()
-  .fromFile("bezkoder.csv")
-  .then(csvData => {
-    console.log(csvData);
-/*
-[ { id: '1',
-    name: 'Node.js',
-    description: 'JavaScript runtime environment',
-    createdAt: '2019-09-03' },
-  { id: '2',
-    name: 'Vue.js',
-    description: 'JavaScript Framework for building UI',
-    createdAt: '2019-09-06' },
-  { id: '3',
-    name: 'Angular.js',
-    description: 'Platform for building mobile & desktop web app',
-    createdAt: '2019-09-09' } ]
-*/
-  });
-  
-  mongodb.connect(
-  url,
-  { useNewUrlParser: true, useUnifiedTopology: true },
-  (err, client) => {
-    if (err) throw err;
-    client
-      .db("zkoder_db")
-      .collection("category")
-      .insertMany(csvData, (err, res) => {
-        if (err) throw err;
-        console.log(`Inserted: ${res.insertedCount} rows`);
-        client.close();
-      });
-  }
-);
 
-> db.category.find()
+
+#index.js
+
+const csvtojson = require(‘csvtojson’);
+const mongodb = require(‘mongodb’);
+const fs = require("fs");
+const fastcsv = require("fast-csv");
+onst yargs = require('yargs');
+
+
+
+var dbConn;
+mongodb.MongoClient.connect(url, {
+    useUnifiedTopology: true,
+}).then((client) => {
+    console.log(‘DB Connected!’);
+    dbConn = client.db();
+}).catch(err => {
+    console.log(“DB Connection Error: ${err.message}”);
+});
+
+
+const fileName = “data.csv”;
+var arrayToInsert = [];
+csvtojson().fromFile(fileName).then(source => {
+    for (var i = 0; i < source.length; i++) {
+         var oneRow = {
+             firstName: source[i][“Firstname”],
+             lastName: source[i][“Lastname”],
+             city: source[i][“City”],
+             salary: source[i][“Salary”]
+         };
+         arrayToInsert.push(oneRow);
+     }
+     var collectionName = ‘employees’;
+     var collection = dbConn.collection(collectionName);
+     collection.insertMany(arrayToInsert, (err, result) => {
+         if (err) console.log(err);
+         if(result){
+             console.log(“Import CSV into database successfully.”);
+         }
+     });
+});
+
+
+#node index.js
